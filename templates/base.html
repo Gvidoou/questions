@@ -21,8 +21,13 @@
 
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="/login" >Sign in</a></li>
-                <li><a href="/register" >Sign Up</a></li>
+                {% if g.user.is_authenticated() %}
+                    <p class="navbar-text">{{ g.user.name }}</p>
+                    <li><a href="/logout" >Log out</a></li>
+                {% else %}
+                    <li><a href="/login" >Sign in</a></li>
+                    <li><a href="/register" >Sign Up</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>

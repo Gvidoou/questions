@@ -81,6 +81,8 @@ def before_request():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+    if g.user.is_authenticated():
+        return redirect(url_for('main_page'))
 
     if request.method == 'POST':
         # login and validate the user...
@@ -100,6 +102,9 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = LoginForm()
+    if g.user.is_authenticated():
+        return redirect(url_for('main_page'))
+
     if request.method == 'POST' and form.validate():
         name = request.form['name']
         password = request.form['password']
@@ -114,6 +119,7 @@ def register():
 @app.route('/logout')
 def logout():
     logout_user()
+    flash('You are logged out.')
     return redirect(url_for('main_page'))
 
 
