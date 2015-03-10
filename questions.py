@@ -1,13 +1,13 @@
-from flask import Flask, render_template, url_for, flash, request, redirect
-from flask.ext.login import LoginManager, login_user
+from flask import Flask, render_template, url_for, flash, request, redirect, g
+from flask.ext.login import LoginManager, login_user, current_user, logout_user
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
-from wtforms import Form, StringField
-from wtforms.validators import required
-
+from wtforms import StringField, PasswordField, validators
+from flask.ext.wtf import Form
 app = Flask(__name__)
 app.config.update(
+    CSRF_ENABLED=True,
     DEBUG=True,
     SECRET_KEY='secret key',
 )
@@ -36,8 +36,8 @@ def shutdown_session(exception=None):
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    name = Column(String, primary_key=True)
-    password = Column(String, primary_key=True)
+    name = Column(String, unique=True)
+    password = Column(String)
 
     def __init__(self, name, password):
         self.name = name
@@ -69,8 +69,13 @@ def load_user(userid):
 
 
 class LoginForm(Form):
-    name = StringField('Login', validators=[required()])
-    password = StringField('Password', validators=[required()])
+    name = StringField('Login', validators=[validators.DataRequired()])
+    password = PasswordField('Password', validators=[validators.DataRequired()])
+
+
+@app.before_request
+def before_request():
+    g.user = current_user
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -92,8 +97,29 @@ def login():
     return render_template("login_form.html", form=form, title='Sign In')
 
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = LoginForm()
+    if request.method == 'POST' and form.validate():
+        name = request.form['name']
+        password = request.form['password']
+        user = User(name, password)
+        db_session.add(user)
+        db_session.commit()
+        flash("You have successfully registered. Now you can log in.")
+        return redirect(url_for('login'))
+    return render_template('login_form.html', form=form, title='Sign up')
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('main_page'))
+
+
 # decelerating models
 def init_db():
     Base.metadata.create_all(bind=engine)
 
+init_db()
 app.run(debug=True)
