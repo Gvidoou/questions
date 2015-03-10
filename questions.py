@@ -108,11 +108,17 @@ def register():
     if request.method == 'POST' and form.validate():
         name = request.form['name']
         password = request.form['password']
-        user = User(name, password)
-        db_session.add(user)
-        db_session.commit()
-        flash("You have successfully registered. Now you can log in.")
-        return redirect(url_for('login'))
+        if not User.query.filter_by(name=name):
+            user = User(name, password)
+            db_session.add(user)
+            db_session.commit()
+            flash("You have successfully registered. Now you can log in.")
+            return redirect(url_for('login'))
+        else:
+            flash('This name already used. Please try again.')
+            return render_template('login_form.html',
+                                   form=form,
+                                   title='Sign up')
     return render_template('login_form.html', form=form, title='Sign up')
 
 
