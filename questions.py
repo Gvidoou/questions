@@ -38,6 +38,7 @@ class User(Base):
     password = Column(String)
     asked_questions = relationship('Questions')
     answers = relationship('Answers')
+    like = relationship('Like')
 
     def __init__(self, name, password):
         self.name = name
@@ -79,11 +80,26 @@ class Answers(Base):
     answer = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     question_id = Column(Integer, ForeignKey('questions.id'), nullable=False)
+    like = relationship('Like')
+    likes = Column(Integer)
 
     def __init__(self, answer, user_id, question_id):
         self.answer = answer
         self.user_id = user_id
         self.question_id = question_id
+        self.likes = 0
+
+
+class Like(Base):
+    __tablename__ = 'likes'
+    id = Column(Integer, primary_key=True)
+    answer = Column(Integer, ForeignKey('answers.id'), nullable=False)
+    user = Column(Integer, ForeignKey('users.id'), nullable=False)
+
+    def __init__(self, answer, user):
+        self.answer = answer
+        self.user = user
+
 
 # login settings
 login_manager = LoginManager()
@@ -141,6 +157,7 @@ def add_question():
     return render_template('add_question.html', title='Add question', form=form)
 
 
+@login_required
 @app.route('/answer/<question_id>', methods=['GET', 'POST'])
 def answer(question_id):
     form = AnswerForm()
@@ -210,6 +227,26 @@ def logout():
     flash('You are logged out.')
     return redirect(url_for('main_page'))
 
+
+@login_required
+@app.route('/like/<answer_id>')
+def like(answer_id):
+
+    user = g.user.id
+    answer = Answers.query.filter_by(id=answer_id).first()
+    if Like.query.filter_by(user=user, answer=answer_id).first():
+        flash('Already voted')
+        return redirect(url_for('main_page'))
+    elif answer:
+        vote = Like(answer=answer_id, user=user)
+        db_session.add(vote)
+        answer.likes += 1
+        db_session.commit()
+        flash("You'r vote successfully submitted")
+        return redirect(url_for("main_page"))
+    else:
+        flash('This answer not available for voting')
+        return redirect(url_for('main_page'))
 
 # decelerating models
 def init_db():

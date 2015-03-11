@@ -1,6 +1,6 @@
 {% block question %}
 <div class="panel panel-default">
-    <div class="panel-heading"><b> Question: {{ question.question }} </b></div>
+    <div class="panel-heading"><b> Question: {{ question.question }} <span class="badge">Answers: {{ question.answers|count }}</span> </b></div>
     <div class="panel-body">
     {% if question.details %}
         <p class="list-group-item-text">
@@ -14,7 +14,7 @@
 
             <ul class="list-group">
                 {% for answer in question.answers %}
-                    <li class="list-group-item">{{ answer.answer }}</li>
+                    <li class="list-group-item"><span class="badge">Votes: {{ answer.likes }}</span> {{ answer.answer }}</li><a href="/like/{{ answer.id }}"><button class="btn btn-default btn-group-justified"> <span class="glyphicon glyphicon-thumbs-up "></span></button></a>
                 {% endfor %}
             </ul>
 
