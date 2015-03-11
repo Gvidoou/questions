@@ -13,12 +13,7 @@ app.config.update(
     SECRET_KEY='secret key',
 )
 
-# main page view
-@app.route('/')
-def main_page():
-    questions = Questions.query.all()
-    return render_template('main.html', title='Ask questions - get answers!',
-                           questions=questions)
+# All db configurations
 
 # connecting to DB
 engine = create_engine('sqlite:///' + app.root_path + 'questions.db', echo=True)
@@ -35,7 +30,7 @@ def shutdown_session(exception=None):
     db_session.remove()
 
 
-# user class
+# All models
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
@@ -62,14 +57,53 @@ class User(Base):
     def get_id(self):
         return unicode(self.id)
 
+
+class Questions(Base):
+    __tablename__ = 'questions'
+    id = Column(Integer, primary_key=True)
+    question = Column(String)
+    details = Column(String)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+
+    def __init__(self, details, question, user_id):
+        self.details = details
+        self.question = question
+        self.user_id = user_id
+
+
+# login settings
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 
+@login_manager.user_loader
+def load_user(userid):
+    return User.query.get(int(userid))
+
+
+# Forms
 class AddQuestionForm(Form):
     question = StringField('Question', validators=[validators.length(3, 30)])
     details = TextAreaField('Description', validators=[validators.optional()])
+
+
+class LoginForm(Form):
+    name = StringField('Login', validators=[validators.DataRequired()])
+    password = PasswordField('Password', validators=[validators.DataRequired()])
+
+
+@app.before_request
+def before_request():
+    g.user = current_user
+
+
+# All views
+@app.route('/')
+def main_page():
+    questions = Questions.query.all()
+    return render_template('main.html', title='Ask questions - get answers!',
+                           questions=questions)
 
 
 @app.route('/add', methods=['GET', 'POST'])
@@ -87,34 +121,6 @@ def add_question():
         flash('Your question successfully submitted!')
         return redirect(url_for('main_page'))
     return render_template('add_question.html', title='Add question', form=form)
-
-
-class Questions(Base):
-    __tablename__ = 'questions'
-    id = Column(Integer, primary_key=True)
-    question = Column(String)
-    details = Column(String)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-
-    def __init__(self, details, question, user_id):
-        self.details = details
-        self.question = question
-        self.user_id = user_id
-
-
-@login_manager.user_loader
-def load_user(userid):
-    return User.query.get(int(userid))
-
-
-class LoginForm(Form):
-    name = StringField('Login', validators=[validators.DataRequired()])
-    password = PasswordField('Password', validators=[validators.DataRequired()])
-
-
-@app.before_request
-def before_request():
-    g.user = current_user
 
 
 @app.route('/login', methods=['GET', 'POST'])
