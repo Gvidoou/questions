@@ -157,8 +157,9 @@ def add_question():
     return render_template('add_question.html', title='Add question', form=form)
 
 
-@login_required
+
 @app.route('/answer/<question_id>', methods=['GET', 'POST'])
+@login_required
 def answer(question_id):
     form = AnswerForm()
     question = Questions.query.filter_by(id=question_id).first()
@@ -228,10 +229,9 @@ def logout():
     return redirect(url_for('main_page'))
 
 
-@login_required
 @app.route('/like/<answer_id>')
+@login_required
 def like(answer_id):
-
     user = g.user.id
     answer = Answers.query.filter_by(id=answer_id).first()
     if Like.query.filter_by(user=user, answer=answer_id).first():
@@ -247,6 +247,7 @@ def like(answer_id):
     else:
         flash('This answer not available for voting')
         return redirect(url_for('main_page'))
+
 
 # decelerating models
 def init_db():
