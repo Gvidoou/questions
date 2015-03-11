@@ -1,0 +1,19 @@
+{% block question %}
+
+<li><h4>Question: {{ question.question }}</h4></li>
+{% if question.details %}
+<li> Detatils: {{ question.details }} </li>
+{% endif %}
+{% if question.answers %}
+    <ul class="list-unstyled">
+        {% for answer in question.answers %}
+            <li>{{ answer.answer }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<a href="answer/{{ question.id }}">
+    <button class="btn btn-primary">Post answer</button>
+</a>
+<hr>
+
+{% endblock %}

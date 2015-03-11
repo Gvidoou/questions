@@ -37,6 +37,7 @@ class User(Base):
     name = Column(String, unique=True)
     password = Column(String)
     asked_questions = relationship('Questions')
+    answers = relationship('Answers')
 
     def __init__(self, name, password):
         self.name = name
@@ -64,12 +65,25 @@ class Questions(Base):
     question = Column(String)
     details = Column(String)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    answers = relationship('Answers')
 
     def __init__(self, details, question, user_id):
         self.details = details
         self.question = question
         self.user_id = user_id
 
+
+class Answers(Base):
+    __tablename__ = 'answers'
+    id = Column(Integer, primary_key=True)
+    answer = Column(String, nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    question_id = Column(Integer, ForeignKey('questions.id'), nullable=False)
+
+    def __init__(self, answer, user_id, question_id):
+        self.answer = answer
+        self.user_id = user_id
+        self.question_id = question_id
 
 # login settings
 login_manager = LoginManager()
@@ -91,6 +105,10 @@ class AddQuestionForm(Form):
 class LoginForm(Form):
     name = StringField('Login', validators=[validators.DataRequired()])
     password = PasswordField('Password', validators=[validators.DataRequired()])
+
+
+class AnswerForm(Form):
+    answer = TextAreaField('Answer', validators=[validators.length(3)])
 
 
 @app.before_request
@@ -121,6 +139,25 @@ def add_question():
         flash('Your question successfully submitted!')
         return redirect(url_for('main_page'))
     return render_template('add_question.html', title='Add question', form=form)
+
+
+@app.route('/answer/<question_id>', methods=['GET', 'POST'])
+def answer(question_id):
+    form = AnswerForm()
+    question = Questions.query.filter_by(id=question_id).first()
+    if not question:
+        flash('Looks like this question is not available')
+        return redirect(url_for('main_page'))
+    if request.method == 'POST' and form.validate():
+        answer_text = request.form['answer']
+        user = g.user.id
+        answer = Answers(answer_text, user, question.id)
+        db_session.add(answer)
+        db_session.commit()
+        flash('Your answer successfully submitted')
+        return redirect(url_for('main_page'))
+    return render_template('answers.html', title='Add answer',
+                           question=question, form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])

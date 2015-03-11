@@ -6,15 +6,11 @@
     </div>
     <div class="row">
         <h3>Asked questions:</h3>
-        {% for question in questions %}
-            <ul class="list-unstyled">
-                <li><h4>Question: {{ question.question }}</h4></li>
-                {% if question.details %}
-                <li> Detatils: {{ question.details }} </li>
-                {% endif %}
-                <hr>
-            </ul>
-        {% endfor %}
+        <ul class="list-unstyled">
+            {% for question in questions %}
+                {% include 'question.html' %}
+            {% endfor %}
+        </ul>
     </div>
 
 </div>
