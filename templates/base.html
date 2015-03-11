@@ -18,6 +18,9 @@
             </div>
             <ul class="nav navbar-nav">
                 <li><a href="/">Questions</a></li>
+                {% if g.user.is_authenticated() %}
+                <li><a href="/add">Add question</a></li>
+                {% endif %}
 
             </ul>
             <ul class="nav navbar-nav navbar-right">
