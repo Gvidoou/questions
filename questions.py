@@ -16,7 +16,9 @@ app.config.update(
 # main page view
 @app.route('/')
 def main_page():
-    return render_template('main.html', title='Ask questions - get answers!')
+    questions = Questions.query.all()
+    return render_template('main.html', title='Ask questions - get answers!',
+                           questions=questions)
 
 # connecting to DB
 engine = create_engine('sqlite:///' + app.root_path + 'questions.db', echo=True)
