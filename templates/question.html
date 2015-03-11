@@ -7,6 +7,9 @@
             Detatils: {{ question.details }}
         </p>
     {% endif %}
+        <p class="text-right help-block">
+            Posted by: {{ question.get_user() }}
+        </p>
     </div>
     <div class="panel-footer">
         {% if question.answers %}
@@ -14,7 +17,14 @@
 
             <ul class="list-group">
                 {% for answer in question.answers %}
-                    <li class="list-group-item"><span class="badge">Votes: {{ answer.likes }}</span> {{ answer.answer }}</li>
+                    <li class="list-group-item">
+                        <span class="badge">Votes: {{ answer.likes }}</span>
+                        {{ answer.answer }}
+                        <p class="text-right help-block">
+                            Posted by: {{ answer.get_user() }}
+                        </p>
+                    </li>
+
                     {% if g.user.is_authenticated() %}
                         <a href="/like/{{ answer.id }}"><button class="btn btn-default btn-group-justified"> <span class="glyphicon glyphicon-thumbs-up "></span></button></a>
                     {% endif %}

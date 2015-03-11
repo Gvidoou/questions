@@ -73,6 +73,9 @@ class Questions(Base):
         self.question = question
         self.user_id = user_id
 
+    def get_user(self):
+        return User.query.filter_by(id=self.user_id).first().name
+
 
 class Answers(Base):
     __tablename__ = 'answers'
@@ -88,6 +91,9 @@ class Answers(Base):
         self.user_id = user_id
         self.question_id = question_id
         self.likes = 0
+
+    def get_user(self):
+        return User.query.filter_by(id=self.user_id).first().name
 
 
 class Like(Base):
