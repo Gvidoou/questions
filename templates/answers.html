@@ -8,7 +8,12 @@
                 <div class="panel-heading"><b>{{ question.question }}</b></div>
 
                 <div class="panel-body">
-                    {{ question.details }}
+                    <p>
+                        {{ question.details }}
+                    </p>
+                    <p class="text-right help-block">
+                        Posted by: {{ question.get_user() }}
+                    </p>
                 </div>
                 <div class="panel-footer">
                     {% if question.answers %}
@@ -16,7 +21,11 @@
 
                         <ul class="list-group">
                             {% for answer in question.answers %}
-                                <li class="list-group-item">{{ answer.answer }}</li>
+                                <li class="list-group-item">{{ answer.answer }}
+                                    <p class="text-right help-block">
+                                        Posted by: {{ answer.get_user() }}
+                                    </p>
+                                </li>
                             {% endfor %}
                         </ul>
 
