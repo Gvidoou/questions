@@ -1,19 +1,30 @@
 {% block question %}
+<div class="panel panel-default">
+    <div class="panel-heading"><b> Question: {{ question.question }} </b></div>
+    <div class="panel-body">
+    {% if question.details %}
+        <p class="list-group-item-text">
+            Detatils: {{ question.details }}
+        </p>
+    {% endif %}
+    </div>
+    <div class="panel-footer">
+        {% if question.answers %}
+        <p>Answers:</p>
 
-<li><h4>Question: {{ question.question }}</h4></li>
-{% if question.details %}
-<li> Detatils: {{ question.details }} </li>
-{% endif %}
-{% if question.answers %}
-    <ul class="list-unstyled">
-        {% for answer in question.answers %}
-            <li>{{ answer.answer }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-<a href="answer/{{ question.id }}">
-    <button class="btn btn-primary">Post answer</button>
-</a>
-<hr>
+            <ul class="list-group">
+                {% for answer in question.answers %}
+                    <li class="list-group-item">{{ answer.answer }}</li>
+                {% endfor %}
+            </ul>
+
+        {% endif %}
+        {% if g.user.is_authenticated() %}
+        <a href="answer/{{ question.id }}">
+            <button class="btn btn-default btn-group-justified">Post answer</button>
+        </a>
+        {% endif %}
+    </div>
+</div>
 
 {% endblock %}
