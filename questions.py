@@ -16,7 +16,7 @@ app.config.update(
 # All db configurations
 
 # connecting to DB
-engine = create_engine('sqlite:///' + app.root_path + 'questions.db', echo=True)
+engine = create_engine('sqlite:///' + app.root_path + '/questions.db', echo=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
