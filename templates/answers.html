@@ -15,10 +15,15 @@
                         Posted by: {{ question.get_user() }}
                     </p>
                 </div>
+                <p class="text-center">
+                    <button class="btn btn-default " type="button" data-toggle="collapse" data-target="#answers" aria-expanded="false" aria-controls="collapseExample">
+                        Show answers
+                    </button>
+                </p>
                 <div class="panel-footer">
                     {% if question.answers %}
                     <p><b>Answers:</b></p>
-
+                    <div class="collapse" id="answers">
                         <ul class="list-group">
                             {% for answer in question.answers %}
                                 <li class="list-group-item">{{ answer.answer }}
@@ -28,7 +33,7 @@
                                 </li>
                             {% endfor %}
                         </ul>
-
+                    </div>
                     {% endif %}
                 </div>
             </div>
