@@ -1,6 +1,5 @@
 from flask import render_template, url_for, flash, request, redirect, g
 from flask.ext.login import login_user, logout_user, login_required
-
 from app.forms import AddQuestionForm, LoginForm, AnswerForm
 from app.models import Questions, Answers, User, Like, db_session, login_manager
 from app import app
